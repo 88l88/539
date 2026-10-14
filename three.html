@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<!-- 關鍵修正 1：鎖定視窗寬度，禁止瀏覽器預設放大 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* 鎖定 body 不會產生雙重滾動條導致畫面撐大 */
+}
+
+/* 外層容器：改用 max-width: 100% 確保瀏覽器內絕不超出畫面 */
+.wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1205px;
+    height: 100vh;
+    margin: 0 auto;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+#leftSidebar {
+    width: 39.855px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.main-content {
+    flex-grow: 1;
+    min-width: 0;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+#rightSidebar {
+    width: 39.855px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    margin-left: 2px;
+}
+
+/* 關鍵修正 2：表格容器隨螢幕高度自適應，不再死板固定 585px */
+.table-container {
+    height: 100%;
+    max-height: 100vh; 
+    overflow-y: auto;
+    overflow-x: auto;
+    position: relative;
+    background: #E8E8D0;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+#table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #E8E8D0;
+    table-layout: fixed;
+}
+
+/* 固定表頭 (thead) 與固定尾列 (tfoot) */
+#table thead th,
+#table thead td {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #E8E8D0;
+    box-shadow: inset 0 -2px 0 #000;
+}
+
+#table tfoot th,
+#table tfoot td {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background: #E8E8D0;
+    box-shadow: inset 0 2px 0 #000;
+}
+
+#thead div {
+    width: 100%;
+    height: 23px;
+    line-height: 23px;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px !important;
+    font-weight: bold !important;
+}
+
+#thead td {
+    width: 25px;
+    height: 25px;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+#tbody div {
+    height: 18px;
+    font-size: 13px !important;
+    font-weight: bold !important;
+    padding: 0;
+    margin: 0 auto;
+}
+
+#tbody td {
+    width: 25px;
+    height: 18px;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0;
+}
+
+/* 尾列樣式 */
+#tfoot td {
+    width: 25px;
+    height: 18px;
+    text-align: center;
+    vertical-align: middle;
+    border: 0.3px solid #fff;
+    padding: 0;
+    background: #E8E8D0;
+}
+
+/* 第一欄（日期欄）固定 120px */
+#table th:first-child,
+#table td:first-child {
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+}
+
+.cap {
+    width: 110px;
+    height: 18px;
+    border-radius: 6px;
+    line-height: 24px;
+    margin: 0 auto;
+}
+
+/* 置頂號碼球，防止被背景線穿越 */
+.ball {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    line-height: 24px;
+    margin: 0 auto;
+    cursor: pointer;
+    position: relative;
+    z-index: 5;
+}
+
+.cap2 {
+    width: 110px;
+    height: 18px;
+    border-radius: 5px;
+    line-height: 18px;
+    margin: 0 auto;
+    color: #fff;
+}
+
+/* 開出號碼紅圈：置頂 z-index，蓋在線條上方 */
+.ball2 {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    line-height: 18px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+    cursor: pointer;
+}
+
+/* 尾列總次數小圓圈 */
+.tfoot-ball {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    line-height: 24px;
+    margin: 0 auto;
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
+    font-size: 9px;
+    font-weight: bold;
+    position: relative;
+    z-index: 5;
+}
+</style>
+
+<script src="https://88ll88.github.io/888/ddd.js"></script>
+<script src="https://88ll88.github.io/88/zzz.js"></script>
+<script src="https://88ll88.github.io/539/left.js"></script>
+<script src="https://88ll88.github.io/539/right.js"></script>
+</head>
+<body>
+
+  <div class="wrapper">
+      <div id="leftSidebar"></div>    
+      
+      <div class="main-content">
+          <div class="table-container">
+              <table id="table">
+                  <thead id="thead"></thead>
+                  <tbody id="tbody"></tbody>
+                  <tfoot id="tfoot"></tfoot>
+              </table>
+          </div>
+      </div>
+
+      <div id="rightSidebar"></div>
+  </div>
+
+<script>
+var activeNum = null;
+
+// 切換高亮指定號碼走勢線 (點擊可高亮粗紅線，再點一次取消)
+function toggleHighlightLine(numStr) {
+    if (activeNum === numStr) {
+        activeNum = null;
+    } else {
+        activeNum = numStr;
+    }
+
+    for (var i = 1; i <= 39; i++) {
+        var padded = String(i).padStart(2, "0");
+        var lineElem = document.getElementById("line-" + padded);
+        if (lineElem) {
+            if (padded === activeNum) {
+                lineElem.setAttribute("stroke", "#ff0000");
+                lineElem.setAttribute("stroke-width", "3");
+                lineElem.parentNode.appendChild(lineElem);
+            } else {
+                lineElem.setAttribute("stroke", "#cccccc");
+                lineElem.setAttribute("stroke-width", "1");
+            }
+        }
+    }
+}
+
+// 收集資料範圍共用
+var validRows = [];
+if (typeof zzz !== 'undefined') {
+    for (var x = 0; x < zzz.length; x++) {
+        validRows.push(zzz[x]);
+        if (zzz[x][0] === '2024-01-01') break;
+    }
+}
+
+// 1. 表頭產生
+(function AA () {
+    var thead = document.getElementById("thead");
+    var H1 = `<tr style="height: 25px;">
+    <td style="width: 120px;"><div class="cap" style="background: #8a8a5c; color: #fff;">日期</div></td>`;
+
+    for (var i = 1; i <= 39; i++) {
+        var S = String(i).padStart(2, "0");
+        var C = (i < 14 ? "#000093" : (i < 27 ? "#007500" : "#9F5000"));
+        H1 += `<td><div class="ball" style="background: ${C};" onclick="toggleHighlightLine('${S}')">${S}</div></td>`;
+    }
+    H1 += `<td><div class="ball" style="border:1px solid #000; color: #000; background:#fff;">#</div></td></tr>`;
+    thead.innerHTML = H1;
+})();
+
+var End = "2024-01-01";
+var totalCounts = {};
+for (var i = 1; i <= 39; i++) totalCounts[String(i).padStart(2, "0")] = 0;
+
+var firstDate = "";
+var lastDate = "";
+if (typeof zzz !== 'undefined' && zzz.length > 0) lastDate = zzz[0][0];
+
+// 2. 表格內容與總次數計算
+(function BB () {
+    var tbody = document.getElementById("tbody");
+    var H2 = "";
+
+    if (typeof zzz !== 'undefined') {
+        for (var i = 0; i < zzz.length; i++) {
+            var dateStr = zzz[i][0];
+            var falling = zzz[i][1];
+            
+            if (dateStr === End || i === zzz.length - 1) {
+                firstDate = dateStr;
+            }
+
+            for (var k = 0; k < falling.length; k++) {
+                var num = falling[k];
+                if (totalCounts[num] !== undefined) {
+                    totalCounts[num]++;
+                }
+            }
+
+            H2 += `<tr style="height: 20px;"><td style="width:120px;"><div class="cap2" style="background: #c2c2a3; color: #000;">${dateStr}</div></td>`;
+            
+            for (var j = 1; j <= 39; j++) {
+                var S = String(j).padStart(2, "0");
+                if (falling.includes(S)) {
+                   H2 += `<td style="width: 25px;"><div class="ball2" style="background:#c30;" onclick="toggleHighlightLine('${S}')">${S}</div></td>`;
+                } else {
+                   H2 += `<td><div></div></td>`;
+                }
+            }
+            H2 += `<td><div style="color:#000;">${i+1}</div></td></tr>`;
+            
+            if (dateStr === End) break;
+        }
+    }
+    tbody.innerHTML = H2;
+})();
+
+// 3. 固定尾列 (tfoot) 產生
+(function CC () {
+    var tfoot = document.getElementById("tfoot");
+    var H3 = `<tr style="height: 25px;">
+    <td style="width: 120px;"><div class="cap2" style="background: #8a8a5c; color: #fff; font-size:10px;">Today~${firstDate}</div></td>`;
+
+    for (var i = 1; i <= 39; i++) {
+        var S = String(i).padStart(2, "0");
+        var count = totalCounts[S];
+        H3 += `<td><div class="tfoot-ball" onclick="toggleHighlightLine('${S}')" style="cursor:pointer;">${count}</div></td>`;
+    }
+    H3 += `<td><div class="tfoot-ball">-</div></td></tr>`;
+    tfoot.innerHTML = H3;
+})();
+
+// 4. 精準對齊與純座標渲染 (不受瀏覽器螢幕拉大影響)
+function renderTrendSvg() {
+    var table = document.getElementById("table");
+    var container = document.querySelector('.table-container');
+    if (!table || !container) return;
+
+    var oldSvg = container.querySelector("svg.trend-svg");
+    if (oldSvg) oldSvg.remove();
+
+    var containerRect = container.getBoundingClientRect();
+    var tableScrollHeight = table.scrollHeight;
+    var tableWidth = table.offsetWidth;
+
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "trend-svg");
+    svg.style.position = "absolute";
+    svg.style.top = "0";
+    svg.style.left = "0";
+    svg.style.width = tableWidth + "px";
+    svg.style.height = tableScrollHeight + "px";
+    svg.style.pointerEvents = "none";
+    svg.style.zIndex = "1";
+
+    // 抓取表頭中心座標，畫貫穿背景豎線
+    var headThs = table.querySelectorAll("#thead tr:last-child td");
+    var xCenters = {};
+
+    headThs.forEach(function(td, index) {
+        if (index > 0 && index <= 39) {
+            var rect = td.getBoundingClientRect();
+            var centerX = (rect.left + rect.width / 2) - containerRect.left + container.scrollLeft;
+            var numStr = String(index).padStart(2, "0");
+            xCenters[numStr] = centerX;
+
+            var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", centerX);
+            line.setAttribute("y1", 0);
+            line.setAttribute("x2", centerX);
+            line.setAttribute("y2", tableScrollHeight);
+            line.setAttribute("stroke", "#d3d3c0");
+            line.setAttribute("stroke-width", "1");
+            line.setAttribute("stroke-dasharray", "2,2");
+            svg.appendChild(line);
+        }
+    });
+
+    // 收集各號碼中心座標 (X, Y)
+    var numberPoints = {};
+    for (var i = 1; i <= 39; i++) {
+        var numStr = String(i).padStart(2, "0");
+        numberPoints[numStr] = [];
+
+        if (headThs[i]) {
+            var headBall = headThs[i].querySelector(".ball") || headThs[i];
+            var headRect = headBall.getBoundingClientRect();
+            var hX = (headRect.left + headRect.width / 2) - containerRect.left + container.scrollLeft;
+            var hY = (headRect.top + headRect.height / 2) - containerRect.top + container.scrollTop;
+            numberPoints[numStr].push({ x: hX, y: hY });
+        }
+    }
+
+    var rows = table.querySelectorAll("#tbody tr");
+    rows.forEach(function(tr) {
+        var tds = tr.querySelectorAll("td");
+        tds.forEach(function(td, colIdx) {
+            if (colIdx >= 1 && colIdx <= 39) {
+                var numStr = String(colIdx).padStart(2, "0");
+                var ball = td.querySelector(".ball2");
+                if (ball) {
+                    var rect = ball.getBoundingClientRect();
+                    var centerY = (rect.top + rect.height / 2) - containerRect.top + container.scrollTop;
+                    var centerX = xCenters[numStr];
+                    numberPoints[numStr].push({ x: centerX, y: centerY });
+                }
+            }
+        });
+    });
+
+    // 繪製走勢折線
+    for (var num = 1; num <= 39; num++) {
+        var paddedNum = String(num).padStart(2, "0");
+        var pts = numberPoints[paddedNum];
+        if (pts.length > 0) {
+            var pointsStr = pts.map(function(p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ");
+            var polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+            polyline.setAttribute("id", "line-" + paddedNum);
+            polyline.setAttribute("points", pointsStr);
+            polyline.setAttribute("fill", "none");
+            polyline.setAttribute("stroke", (paddedNum === activeNum) ? "#ff0000" : "#cccccc");
+            polyline.setAttribute("stroke-width", (paddedNum === activeNum) ? "3" : "1");
+            svg.appendChild(polyline);
+        }
+    }
+
+    container.appendChild(svg);
+}
+
+// 載入與視窗調整監聽
+window.addEventListener('load', renderTrendSvg);
+window.addEventListener('resize', renderTrendSvg);
+</script>
+</body>
+</html>
